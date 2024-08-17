@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piuda_ui/models/text_validation_model.dart';  // 모델을 임포트
+import 'package:piuda_ui/models/text_validation_model.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
