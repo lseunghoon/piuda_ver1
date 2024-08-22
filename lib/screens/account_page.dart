@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piuda_ui/screens/profile_change_page.dart';
+import 'package:piuda_ui/screens/signin_page.dart';
 import 'package:piuda_ui/widgets/bottom_navigator.dart';
 
 class AccountPage extends StatelessWidget {
@@ -104,7 +105,9 @@ class AccountPage extends StatelessWidget {
                               ),
                               onPressed: () {
                                 // 로그아웃 로직 구현
-                                Navigator.of(context).pop();
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => LoginPage())
+                                );
                               },
                             ),
                             TextButton(

@@ -1,45 +1,71 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class ImageProviderModel with ChangeNotifier {
-  List<String> _imageUrls = [];  // 이미지 파일 경로들
+class ApiService {
+  final String _baseUrl = 'http://49.142.181.186:8000'; // 베이스 URL
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
-  List<String> get imageUrls => _imageUrls;
+  // 오디오 업로드
+  Future<void> uploadAudio(List<int> audioData, String filename) async {
+    Map<String, dynamic> body = {
+      'data': audioData,
+      'filename': filename,
+    };
 
-  final ImagePicker _picker = ImagePicker();
+    String? token = await _storage.read(key: 'access_token');
 
-  // 이미지 선택
-  Future<void> pickImage(ImageSource source) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      final File imageFile = File(image.path);
-      await _uploadImage(imageFile);  // 이미지 업로드
-      notifyListeners();
+    if (token == null) {
+      print("No access token found. Please log in first.");
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/upload'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200) {
+        print("Audio uploaded successfully!");
+      } else {
+        print("Failed to upload audio. Status code: ${response.statusCode}");
+        print("Response body: ${response.body}");
+      }
+    } catch (e) {
+      print("Error: $e");
     }
   }
 
-  // 이미지를 Base64로 인코딩한 후 서버로 업로드
-  Future<void> _uploadImage(File file) async {
+  // 이미지 업로드 (Base64 인코딩)
+  Future<void> uploadImage(File imageFile) async {
     try {
-      // 파일을 Base64로 인코딩
-      final bytes = await file.readAsBytes();
+      final bytes = await imageFile.readAsBytes();
       String base64Image = base64Encode(bytes);
 
-      // 서버로 POST 요청을 통해 전송
+      String? token = await _storage.read(key: 'access_token');
+
+      if (token == null) {
+        print("No access token found. Please log in first.");
+        return;
+      }
+
       final response = await http.post(
-        Uri.parse('http://your-server.com/upload-image'), // 서버의 URL로 변경
-        headers: {"Content-Type": "application/json"},
+        Uri.parse('$_baseUrl/upload-image'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
         body: jsonEncode({"image": base64Image}),
       );
 
       if (response.statusCode == 200) {
         print('Image uploaded successfully!');
-        // 성공적으로 업로드한 이미지를 로컬 리스트에 추가할 수 있습니다.
-        _imageUrls.add(file.path);
-        notifyListeners();
       } else {
         print('Failed to upload image: ${response.statusCode}');
       }
@@ -48,27 +74,5 @@ class ImageProviderModel with ChangeNotifier {
     }
   }
 
-  // 저장된 이미지 URL 불러오기 (로컬 저장소에서 불러오는 것으로 가정)
-  Future<void> loadImages() async {
-    // 로컬 파일 시스템에서 이미지 경로들을 불러와 `_imageUrls`에 추가하는 로직을 작성할 수 있습니다.
-    // 예를 들어, 디렉터리에서 파일 목록을 읽어오는 방식으로 구현할 수 있습니다.
-    notifyListeners();
-  }
-
-  // 이미지 삭제
-  Future<void> deleteImage(String imagePath) async {
-    try {
-      // 로컬 파일 시스템에서 이미지 삭제
-      final file = File(imagePath);
-      if (await file.exists()) {
-        await file.delete();
-      }
-
-      // 이미지 경로 리스트에서 해당 이미지 제거
-      _imageUrls.remove(imagePath);
-      notifyListeners();
-    } catch (e) {
-      print('Error deleting image: $e');
-    }
-  }
+// 다른 API 메소드들을 여기에 추가할 수 있습니다.
 }

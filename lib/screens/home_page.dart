@@ -20,7 +20,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    context.read<ImageProviderModel>().loadImages();
+    Future.microtask(() async {
+      await context.read<ImageProviderModel>().loadImages();
+      // notifyListeners()는 loadImages 내부에서 호출되므로 여기서 별도로 호출할 필요는 없습니다.
+    });
   }
 
   @override
