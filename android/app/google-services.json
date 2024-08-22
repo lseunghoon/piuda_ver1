@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "701696521060",
+    "project_id": "recall69ee6",
+    "storage_bucket": "recall69ee6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:701696521060:android:6c8c50358d728ece240071",
+        "android_client_info": {
+          "package_name": "com.example.piuda_ui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlJJOrslMw_2Jp7DD8TeBonCemQ4PRlNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

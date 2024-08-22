@@ -1,25 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:piuda_ui/widgets/bottom_navigator.dart'; // 필요한 파일을 추가
-import 'alarm_page.dart'; // AlarmPage import
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: HomePage(),
-    );
-  }
-}
+import 'package:flutter/material.dart';
+import 'package:piuda_ui/models/image_model.dart';
+import 'package:piuda_ui/widgets/bottom_navigator.dart';
+import 'package:piuda_ui/screens/alarm_page.dart';
+import 'package:piuda_ui/screens/chat_page.dart';
+import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:piuda_ui/service/api_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,53 +14,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<File?> _images = []; // 이미지를 저장할 리스트
-  final ImagePicker _picker = ImagePicker();
-  int _selectedIndex = 0; // 선택된 페이지 인덱스
+  int _currentPage = 0;
+  final ApiService _apiService = ApiService(); // ApiService 인스턴스 생성
 
-  // 이미지를 선택하는 함수
-  Future<void> _pickImage(ImageSource source) async {
-    final XFile? image = await _picker.pickImage(source: source);
-
-    if (image != null) {
-      setState(() {
-        _images.add(File(image.path));
-      });
-    }
-  }
-
-  // 옵션을 보여주는 함수
-  void _showPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext bc) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                  leading: Icon(Icons.photo_library),
-                  title: Text('갤러리에서 선택'),
-                  onTap: () {
-                    _pickImage(ImageSource.gallery);
-                    Navigator.of(context).pop();
-                  }),
-              ListTile(
-                leading: Icon(Icons.photo_camera),
-                title: Text('카메라로 촬영'),
-                onTap: () {
-                  _pickImage(ImageSource.camera);
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    context.read<ImageProviderModel>().loadImages();
   }
 
   @override
   Widget build(BuildContext context) {
+    final imageProvider = context.watch<ImageProviderModel>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('홈'),
@@ -83,7 +36,7 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AlarmPage()), // AlarmPage로 이동
+              MaterialPageRoute(builder: (context) => AlarmPage()),
             );
           },
         ),
@@ -96,7 +49,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // 상단 이미지 섹션
           Container(
             margin: EdgeInsets.all(8.0),
             width: MediaQuery.of(context).size.width,
@@ -137,86 +89,36 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(height: 16),
-          // 이미지 추가 버튼과 이미지 목록이 있는 스크롤 가능한 영역
           Expanded(
             child: Center(
               child: Container(
                 height: 300,
                 child: PageView.builder(
                   controller: PageController(viewportFraction: 0.7),
-                  itemCount: _images.length + 1, // 이미지 수 + 추가 버튼
+                  itemCount: imageProvider.imageUrls.length + 1,  // Add one for the add button
                   onPageChanged: (index) {
                     setState(() {
-                      _selectedIndex = index;
+                      _currentPage = index;
                     });
                   },
                   itemBuilder: (context, index) {
-                    if (index == 0) {
-                      // 첫 번째 항목은 추가 버튼
-                      var scale = _selectedIndex == index ? 1.0 : 0.8;
-                      return TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 350),
-                        tween: Tween(begin: scale, end: scale),
-                        curve: Curves.ease,
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: child,
-                          );
-                        },
-                        child: GestureDetector(
-                          onTap: () => _showPicker(context),
-                          child: Container(
-                            margin: EdgeInsets.symmetric(horizontal: 10.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[300],
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.add_circle, color: Colors.blue, size: 80),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    '과거의 나를 불러오세요.',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
+                    if (index == 0 && imageProvider.imageUrls.isEmpty) {
+                      return _buildAddImageButton(context);  // Show add button when list is empty
+                    } else if (index == 0) {
+                      return _buildAddImageButton(context);  // First index for add button
+                    } else {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatBotPage(
+                                imageUrl: imageProvider.imageUrls[index - 1],  // 이미지 URL 전달
                               ),
                             ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      // 나머지 항목들은 이미지들
-                      var scale = _selectedIndex == index ? 1.0 : 0.8;
-                      return TweenAnimationBuilder(
-                        duration: const Duration(milliseconds: 350),
-                        tween: Tween(begin: scale, end: scale),
-                        curve: Curves.ease,
-                        builder: (context, value, child) {
-                          return Transform.scale(
-                            scale: value,
-                            child: child,
                           );
                         },
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 10.0),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(20),
-                            image: _images[index - 1] != null
-                                ? DecorationImage(
-                              image: FileImage(_images[index - 1]!),
-                              fit: BoxFit.cover,
-                            )
-                                : null,
-                          ),
-                        ),
+                        child: _buildRemoteImageCard(context, index - 1, imageProvider),  // Remote images only
                       );
                     }
                   },
@@ -226,7 +128,122 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 2), // 하단 네비게이션 바 추가
+      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 2),
     );
+  }
+
+  Widget _buildAddImageButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _showPicker(context),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 10.0),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_circle, color: Colors.blue, size: 80),
+              SizedBox(height: 8),
+              Text(
+                '과거의 나를 불러오세요.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRemoteImageCard(BuildContext context, int index, ImageProviderModel imageProvider) {
+    final imageUrl = imageProvider.imageUrls[index];
+
+    return Stack(
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 10.0),
+          decoration: BoxDecoration(
+            color: Colors.grey[300],
+            borderRadius: BorderRadius.circular(20),
+            image: DecorationImage(
+              image: NetworkImage(imageUrl),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 10,
+          top: 10,
+          child: GestureDetector(
+            onTap: () {
+              imageProvider.deleteImage(imageUrl);
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.close,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 이미지 선택 후 서버에 업로드하는 메서드
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('갤러리에서 선택'),
+                onTap: () async {
+                  XFile? image = await _pickImageFromGallery(context);
+                  Navigator.of(context).pop();
+                  if (image != null) {
+                    await _apiService.uploadImage(File(image.path)); // 이미지 업로드 호출
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('카메라로 촬영'),
+                onTap: () async {
+                  XFile? image = await _pickImageFromCamera(context);
+                  Navigator.of(context).pop();
+                  if (image != null) {
+                    await _apiService.uploadImage(File(image.path)); // 이미지 업로드 호출
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+// 헬퍼 메서드: pickImage를 개별적으로 호출하고 결과를 반환
+  Future<XFile?> _pickImageFromGallery(BuildContext context) async {
+    return await ImagePicker().pickImage(source: ImageSource.gallery);
+  }
+
+  Future<XFile?> _pickImageFromCamera(BuildContext context) async {
+    return await ImagePicker().pickImage(source: ImageSource.camera);
   }
 }

@@ -26,7 +26,7 @@ class _ResetPageState extends State<ResetPage> {
 
   void _sendVerificationCode() {
     // 여기에 전화번호를 확인하고 인증번호를 전송하는 로직을 추가하세요
-    print('인증번호 전송: ${_model.textController3.text}');
+    print('인증번호 전송: ${_model.phoneNumberController.text}');
   }
 
   void _validateAndSubmit() {
@@ -38,12 +38,12 @@ class _ResetPageState extends State<ResetPage> {
       print("유효성 검사 실패");
     }
 
-    // textController4의 값을 출력
-    String? validationResult = _model.textController4Validator(_model.textController4.text);
+    // 인증번호 입력 필드의 값을 출력
+    String? validationResult = _model.validatePassword(_model.passwordController.text);
     if (validationResult != null) {
-      print('textController4Validator 반환값: $validationResult');
+      print('인증번호 검증 실패: $validationResult');
     } else {
-      print('textController4의 값이 유효합니다: ${_model.textController4.text}');
+      print('인증번호가 유효합니다: ${_model.passwordController.text}');
     }
   }
 
@@ -74,8 +74,8 @@ class _ResetPageState extends State<ResetPage> {
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 20),
                 child: TextFormField(
-                  controller: _model.textController3, // textController3 할당
-                  focusNode: _model.textFieldFocusNode3, // textFieldFocusNode3 할당
+                  controller: _model.phoneNumberController, // 전화번호 컨트롤러 사용
+                  focusNode: _model.phoneNumberFocusNode, // 전화번호 포커스 노드 사용
                   autofocus: true,
                   obscureText: false,
                   decoration: InputDecoration(
@@ -85,7 +85,7 @@ class _ResetPageState extends State<ResetPage> {
                     fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
-                  validator: (value) => _model.textController3Validator(value), // 전화번호 검증 로직 추가
+                  validator: _model.validatePhoneNumber, // 전화번호 검증 로직 추가
                 ),
               ),
               Align(
@@ -101,8 +101,8 @@ class _ResetPageState extends State<ResetPage> {
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(8, 0, 8, 20),
                 child: TextFormField(
-                  controller: _model.textController4, // textController4 할당
-                  focusNode: _model.textFieldFocusNode4, // textFieldFocusNode4 할당
+                  controller: _model.passwordController, // 인증번호 컨트롤러 사용
+                  focusNode: _model.passwordFocusNode, // 인증번호 포커스 노드 사용
                   autofocus: true,
                   obscureText: false,
                   decoration: InputDecoration(
@@ -112,7 +112,7 @@ class _ResetPageState extends State<ResetPage> {
                     fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
-                  validator: (value) => _model.textController4Validator(value), // 인증번호 검증 로직 추가
+                  validator: _model.validatePassword, // 인증번호 검증 로직 추가
                 ),
               ),
               Padding(

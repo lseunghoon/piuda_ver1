@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:piuda_ui/widgets/bottom_navigator.dart';
+import 'package:provider/provider.dart';
 
 class StoryListPage extends StatelessWidget {
+  final List<String> ageRanges = [
+    '나의 20대',
+    '나의 30대',
+    '나의 40대',
+    '나의 50대',
+    '나의 60대',
+    '나의 70대',
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final selectedAgeRange = context.watch<SelectedAgeRangeProvider>().selectedAgeRange;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('이야기책'),
         centerTitle: true,
-        leading: Icon(Icons.notifications),
+        leading: IconButton(
+          icon: Icon(Icons.notifications),
+          onPressed: () {
+            // 알림 페이지로 이동
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              // 검색 기능 추가
+            },
           ),
         ],
       ),
@@ -22,7 +41,7 @@ class StoryListPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '나만의 이야기',
+              '김석희 님의 이야기',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -30,19 +49,22 @@ class StoryListPage extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Expanded(
-              child: ListView(
-                children: [
-                  _buildTimeSlotButton(context, '시간대 1', true),
-                  _buildTimeSlotButton(context, '시간대 2', false),
-                  _buildTimeSlotButton(context, '시간대 3', false),
-                ],
+              child: ListView.builder(
+                itemCount: ageRanges.length,
+                itemBuilder: (context, index) {
+                  return _buildAgeRangeButton(
+                    context,
+                    ageRanges[index],
+                    selectedAgeRange == ageRanges[index],
+                  );
+                },
               ),
             ),
             SizedBox(height: 8),
             Center(
               child: Icon(
                 Icons.keyboard_arrow_down,
-                color: Colors.green,
+                color: Colors.blue,
                 size: 40,
               ),
             ),
@@ -53,11 +75,13 @@ class StoryListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTimeSlotButton(BuildContext context, String label, bool isSelected) {
+  Widget _buildAgeRangeButton(
+      BuildContext context, String label, bool isSelected) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 8.0),
+      height: MediaQuery.of(context).size.height * 0.13,
       decoration: BoxDecoration(
-        color: isSelected ? Colors.green : Colors.white,
+        color: isSelected ? Colors.blue : Colors.white,
         borderRadius: BorderRadius.circular(8.0),
         border: Border.all(color: Colors.grey),
       ),
@@ -73,8 +97,46 @@ class StoryListPage extends StatelessWidget {
           ),
         ),
         onTap: () {
-          // 시간대 버튼 클릭 시의 동작 추가
+          // 연령대 선택 시 프로바이더를 통해 상태 관리
+          context.read<SelectedAgeRangeProvider>().setSelectedAgeRange(label);
+          // 연령대별 페이지로 이동
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AgeDetailPage(ageRange: label),
+            ),
+          );
         },
+      ),
+    );
+  }
+}
+
+class SelectedAgeRangeProvider extends ChangeNotifier {
+  String _selectedAgeRange = '나의 20대';
+
+  String get selectedAgeRange => _selectedAgeRange;
+
+  void setSelectedAgeRange(String ageRange) {
+    _selectedAgeRange = ageRange;
+    notifyListeners();
+  }
+}
+
+class AgeDetailPage extends StatelessWidget {
+  final String ageRange;
+
+  AgeDetailPage({required this.ageRange});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(ageRange),
+        centerTitle: true,
+      ),
+      body: Center(
+        child: Text('$ageRange 이야기 페이지'),
       ),
     );
   }

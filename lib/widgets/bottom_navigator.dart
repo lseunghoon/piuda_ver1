@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/screens/story_list_page.dart';
-import 'package:piuda_ui/screens/account_page.dart'; // AccountPage를 import
+import 'package:piuda_ui/screens/account_page.dart';
+import 'package:piuda_ui/screens/board_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -18,7 +19,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
         }
         break;
       case 1:
-      // 게시판 페이지로 이동 (추후 추가)
+        if (currentIndex != 1) {
+          Navigator.of(context).pushReplacement(
+            _createRoute(BoardPage()),
+          );
+        }
         break;
       case 2:
         if (currentIndex != 2) {
