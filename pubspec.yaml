@@ -44,6 +44,9 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   jwt_decoder: ^2.0.1
   font_awesome_flutter: ^10.7.0
+  image: ^4.2.0
+  path_provider: ^2.1.4
+  shared_preferences: ^2.3.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

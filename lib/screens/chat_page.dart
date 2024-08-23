@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:piuda_ui/service/api_service.dart';  // 추가: ApiService 임포트
+import 'package:piuda_ui/service/audio_service.dart';  // 추가: ApiService 임포트
 
 class ChatBotPage extends StatefulWidget {
-  final String imageUrl;
-
-  ChatBotPage({required this.imageUrl});
-
   @override
   _ChatBotPageState createState() => _ChatBotPageState();
 }
@@ -20,7 +16,7 @@ class _ChatBotPageState extends State<ChatBotPage> {
   bool _isRecording = false;
   bool _isPlaying = false;
   bool _isRecordingCompleted = false;
-  final ApiService _apiService = ApiService();  // 추가: ApiService 인스턴스 생성
+  final AudioService _apiService = AudioService();  // 추가: ApiService 인스턴스 생성
 
   @override
   void initState() {
@@ -119,7 +115,7 @@ class _ChatBotPageState extends State<ChatBotPage> {
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(widget.imageUrl),
+                image: AssetImage('assets/latte.jpg'), // 더미 이미지 경로로 변경
                 fit: BoxFit.cover,
               ),
             ),

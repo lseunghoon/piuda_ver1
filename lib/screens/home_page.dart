@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:piuda_ui/models/image_model.dart';
 import 'package:piuda_ui/widgets/bottom_navigator.dart';
@@ -6,7 +5,7 @@ import 'package:piuda_ui/screens/alarm_page.dart';
 import 'package:piuda_ui/screens/chat_page.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:piuda_ui/service/api_service.dart';
+import 'package:piuda_ui/service/image_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,14 +14,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
-  final ApiService _apiService = ApiService(); // ApiService 인스턴스 생성
+  final ImageService _apiService = ImageService(); // ImageService 인스턴스 생성
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() async {
       await context.read<ImageProviderModel>().loadImages();
-      // notifyListeners()는 loadImages 내부에서 호출되므로 여기서 별도로 호출할 필요는 없습니다.
     });
   }
 
@@ -46,7 +44,14 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatBotPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -115,9 +120,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatBotPage(
-                                imageUrl: imageProvider.imageUrls[index - 1],  // 이미지 URL 전달
-                              ),
+                              builder: (context) => ChatBotPage(),
                             ),
                           );
                         },
@@ -216,10 +219,15 @@ class _HomePageState extends State<HomePage> {
                 leading: Icon(Icons.photo_library),
                 title: Text('갤러리에서 선택'),
                 onTap: () async {
-                  XFile? image = await _pickImageFromGallery(context);
-                  Navigator.of(context).pop();
-                  if (image != null) {
-                    await _apiService.uploadImage(File(image.path)); // 이미지 업로드 호출
+                  Navigator.of(context).pop(); // 모달 닫기
+
+                  // 갤러리에서 이미지 선택 및 서버로 업로드
+                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.gallery);
+
+                  if (imageUrl != null) {
+                    context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
+                    // 이미지를 추가한 후 홈 화면으로 이동
+                    Navigator.of(context).pop();
                   }
                 },
               ),
@@ -227,10 +235,15 @@ class _HomePageState extends State<HomePage> {
                 leading: Icon(Icons.photo_camera),
                 title: Text('카메라로 촬영'),
                 onTap: () async {
-                  XFile? image = await _pickImageFromCamera(context);
-                  Navigator.of(context).pop();
-                  if (image != null) {
-                    await _apiService.uploadImage(File(image.path)); // 이미지 업로드 호출
+                  Navigator.of(context).pop(); // 모달 닫기
+
+                  // 카메라로 이미지 촬영 및 서버로 업로드
+                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.camera);
+
+                  if (imageUrl != null) {
+                    context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
+                    // 이미지를 추가한 후 홈 화면으로 이동
+                    Navigator.of(context).pop();
                   }
                 },
               ),
@@ -241,12 +254,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-// 헬퍼 메서드: pickImage를 개별적으로 호출하고 결과를 반환
-  Future<XFile?> _pickImageFromGallery(BuildContext context) async {
-    return await ImagePicker().pickImage(source: ImageSource.gallery);
-  }
+  Future<String?> _selectAndUploadImage(BuildContext context, ImageSource source) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);
 
-  Future<XFile?> _pickImageFromCamera(BuildContext context) async {
-    return await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile == null) {
+      print("No image selected.");
+      return null;
+    }
+
+    // 서버로 이미지 업로드 및 반환 값 받기
+    String? imageUrl = await _apiService.captureAndUploadImage('0');
+
+    // 이미지 업로드 후 홈 화면으로 이동
+    if (imageUrl != null) {
+      Navigator.of(context).pop(); // 현재 화면(카메라 화면) 종료
+    }
+
+    return imageUrl;
   }
 }

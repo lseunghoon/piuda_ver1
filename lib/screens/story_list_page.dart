@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:piuda_ui/widgets/bottom_navigator.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:piuda_ui/widgets/bottom_navigator.dart';
+import 'package:piuda_ui/models/image_model.dart';
+import 'package:piuda_ui/screens/story_detail_page.dart';
+import 'package:piuda_ui/service/image_service.dart'; // ImageService를 가져옵니다
+import 'package:piuda_ui/screens/home_page.dart'; // HomePage로 라우팅하기 위해 추가합니다
 
 class StoryListPage extends StatelessWidget {
-  final List<String> ageRanges = [
-    '나의 20대',
-    '나의 30대',
-    '나의 40대',
-    '나의 50대',
-    '나의 60대',
-    '나의 70대',
-  ];
+  final ImageService _imageService = ImageService(); // ImageService 인스턴스 생성
 
   @override
   Widget build(BuildContext context) {
-    final selectedAgeRange = context.watch<SelectedAgeRangeProvider>().selectedAgeRange;
+    // 더미 데이터
+    List<Map<String, String>> dummyData = [
+      {'title': '제목1', 'imageUrl': ''}, // 이미지 URL은 빈 문자열로 설정하여 더미 이미지 사용
+      {'title': '제목2', 'imageUrl': ''},
+      {'title': '제목3', 'imageUrl': ''},
+      {'title': '제목4', 'imageUrl': ''},
+    ];
 
     return Scaffold(
       appBar: AppBar(
@@ -41,31 +46,31 @@ class StoryListPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '김석희 님의 이야기',
+              '나의 20대',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 16),
             Expanded(
-              child: ListView.builder(
-                itemCount: ageRanges.length,
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                  childAspectRatio: 1,
+                ),
+                itemCount: context.watch<ImageProviderModel>().imageUrls.length + 1 + dummyData.length,
                 itemBuilder: (context, index) {
-                  return _buildAgeRangeButton(
-                    context,
-                    ageRanges[index],
-                    selectedAgeRange == ageRanges[index],
-                  );
+                  if (index == 0) {
+                    return _buildNewStoryButton(context);
+                  } else if (index <= dummyData.length) {
+                    return _buildDummyStoryCard(context, dummyData[index - 1]);
+                  } else {
+                    return _buildStoryCard(context, context.watch<ImageProviderModel>().imageUrls[index - 1 - dummyData.length]);
+                  }
                 },
-              ),
-            ),
-            SizedBox(height: 8),
-            Center(
-              child: Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.blue,
-                size: 40,
               ),
             ),
           ],
@@ -75,69 +80,173 @@ class StoryListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAgeRangeButton(
-      BuildContext context, String label, bool isSelected) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      height: MediaQuery.of(context).size.height * 0.13,
-      decoration: BoxDecoration(
-        color: isSelected ? Colors.blue : Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: Colors.grey),
-      ),
-      child: ListTile(
-        title: Center(
+  Widget _buildNewStoryButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _showPicker(context);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey),
+        ),
+        child: Center(
           child: Text(
-            label,
+            'New Story',
             style: TextStyle(
               fontSize: 18,
-              color: isSelected ? Colors.white : Colors.black,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        onTap: () {
-          // 연령대 선택 시 프로바이더를 통해 상태 관리
-          context.read<SelectedAgeRangeProvider>().setSelectedAgeRange(label);
-          // 연령대별 페이지로 이동
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AgeDetailPage(ageRange: label),
+      ),
+    );
+  }
+
+  Widget _buildStoryCard(BuildContext context, String imageUrl) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryDetailPage(),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey),
+          image: DecorationImage(
+            image: FileImage(File(imageUrl)),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            color: Colors.black.withOpacity(0.5),
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              '제목',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
-}
 
-class SelectedAgeRangeProvider extends ChangeNotifier {
-  String _selectedAgeRange = '나의 20대';
-
-  String get selectedAgeRange => _selectedAgeRange;
-
-  void setSelectedAgeRange(String ageRange) {
-    _selectedAgeRange = ageRange;
-    notifyListeners();
-  }
-}
-
-class AgeDetailPage extends StatelessWidget {
-  final String ageRange;
-
-  AgeDetailPage({required this.ageRange});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(ageRange),
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Text('$ageRange 이야기 페이지'),
+  Widget _buildDummyStoryCard(BuildContext context, Map<String, String> data) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => StoryDetailPage(),
+          ),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Center(
+                child: Icon(Icons.image, size: 50, color: Colors.grey),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  data['title']!,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center, // 텍스트 중앙 정렬
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _showPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('갤러리에서 선택'),
+                onTap: () async {
+                  Navigator.of(context).pop(); // 모달 닫기
+
+                  // 갤러리에서 이미지 선택
+                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.gallery);
+
+                  // 서버에서 반환된 이미지 URL 추가
+                  if (imageUrl != null) {
+                    context.read<ImageProviderModel>().addImageUrl(imageUrl);
+                  }
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('카메라로 촬영'),
+                onTap: () async {
+                  Navigator.of(context).pop(); // 모달 닫기
+
+                  // 카메라로 이미지 촬영
+                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.camera);
+
+                  // 서버에서 반환된 이미지 URL 추가
+                  if (imageUrl != null) {
+                    context.read<ImageProviderModel>().addImageUrl(imageUrl);
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<String?> _selectAndUploadImage(BuildContext context, ImageSource source) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: source);  // 전달된 source 사용
+
+    if (pickedFile == null) {
+      print("No image selected.");
+      return null;
+    }
+
+    // 이미지 파일을 제대로 선택했는지 확인
+    print("Image selected from: ${source == ImageSource.gallery ? 'Gallery' : 'Camera'}");
+
+    // 서버로 이미지 업로드 및 반환 값 받기
+    final ImageService imageService = ImageService();
+    String? imageUrl = await imageService.captureAndUploadImage('0');  // '0'은 targetAge 예시입니다.
+    return imageUrl;
   }
 }

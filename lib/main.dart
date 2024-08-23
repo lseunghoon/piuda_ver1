@@ -16,7 +16,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => CustomAuthProvider()), // AuthProvider 등록
         ChangeNotifierProvider(create: (_) => ImageProviderModel()), // ImageProviderModel 등록
-        ChangeNotifierProvider(create: (_) => SelectedAgeRangeProvider()), // SelectedAgeRangeProvider 등록
         Provider(create: (_) => AuthService()),
       ],
       child: MyApp(),
@@ -108,14 +107,14 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/image/green.png',
+                'assets/image/latte.png',
                 width: 200,
                 height: 200,
                 fit: BoxFit.cover,
               ),
               SizedBox(height: 20),
               Text(
-                '마 함 피우자',
+                '라떼는 말이야',
                 style: TextStyle(
                   fontSize: 24.0,
                   color: Colors.black,
