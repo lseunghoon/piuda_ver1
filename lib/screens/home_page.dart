@@ -237,8 +237,11 @@ class _HomePageState extends State<HomePage> {
                 onTap: () async {
                   Navigator.of(context).pop(); // 모달 닫기
 
+                  // ImageService 인스턴스 생성
+                  final imageService = ImageService();
+
                   // 카메라로 이미지 촬영 및 서버로 업로드
-                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.camera);
+                  String? imageUrl = await imageService.captureAndUploadImage('0'); // '0'은 targetAge 예시입니다.
 
                   if (imageUrl != null) {
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
