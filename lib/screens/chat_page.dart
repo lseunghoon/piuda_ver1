@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:piuda_ui/service/audio_service.dart';  // 추가: ApiService 임포트
+import 'package:piuda_ui/service/audio_service.dart';
 
-class ChatBotPage extends StatefulWidget {
+class ChatPage extends StatefulWidget {
+  final String imageUrl; // 이미지 URL을 전달받기 위한 변수 추가
+
+  ChatPage({required this.imageUrl}); // 생성자에서 이미지 URL을 받아옴
+
   @override
   _ChatBotPageState createState() => _ChatBotPageState();
 }
 
-class _ChatBotPageState extends State<ChatBotPage> {
+class _ChatBotPageState extends State<ChatPage> {
   late FlutterSoundRecorder _recorder;
   late FlutterSoundPlayer _player;
   late String _recordedFilePath;
   bool _isRecording = false;
   bool _isPlaying = false;
   bool _isRecordingCompleted = false;
-  final AudioService _apiService = AudioService();  // 추가: ApiService 인스턴스 생성
+  final AudioService _apiService = AudioService();
 
   @override
   void initState() {
@@ -50,7 +54,7 @@ class _ChatBotPageState extends State<ChatBotPage> {
 
     if (await File(_recordedFilePath).exists()) {
       print('File exists at $_recordedFilePath');
-      await _uploadRecordingToFastAPI();  // 변경: 업로드 함수 호출
+      await _uploadRecordingToFastAPI();
     } else {
       print('녹음 파일이 없습니다.');
     }
@@ -60,13 +64,9 @@ class _ChatBotPageState extends State<ChatBotPage> {
     try {
       final File file = File(_recordedFilePath);
 
-      // 파일의 바이트 데이터를 읽어옵니다.
       final List<int> audioData = await file.readAsBytes();
-
-      // 파일의 이름을 추출합니다.
       final String filename = file.uri.pathSegments.last;
 
-      // ApiService를 통해 업로드 요청을 보냅니다.
       await _apiService.uploadAudio(audioData, filename);
 
       print('Recording uploaded to FastAPI with filename: $filename');
@@ -115,7 +115,7 @@ class _ChatBotPageState extends State<ChatBotPage> {
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/latte.jpg'), // 더미 이미지 경로로 변경
+                image: NetworkImage(widget.imageUrl), // 전달받은 이미지 URL로 이미지 표시
                 fit: BoxFit.cover,
               ),
             ),

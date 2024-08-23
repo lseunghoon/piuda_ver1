@@ -44,14 +44,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatBotPage(),
-                ),
-              );
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -120,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatBotPage(),
+                              builder: (context) => ChatPage(imageUrl: imageProvider.imageUrls[index - 1]), // 전달할 이미지 URL
                             ),
                           );
                         },
@@ -245,8 +238,11 @@ class _HomePageState extends State<HomePage> {
 
                   if (imageUrl != null) {
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
-                    // 이미지를 추가한 후 홈 화면으로 이동
-                    Navigator.of(context).pop();
+                    // 이미지를 추가한 후 HomePage로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
                   }
                 },
               ),
