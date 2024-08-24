@@ -51,7 +51,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
         elevation: 0,
         title: const Text('프로필 수정',
             style: TextStyle(
-                fontWeight: FontWeight.bold,
                 color: Colors.black,
                 fontSize: 20)),
         centerTitle: true,

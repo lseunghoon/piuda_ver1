@@ -75,16 +75,16 @@ class CustomBottomNavigationBar extends StatelessWidget {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: currentIndex,
-      backgroundColor: Colors.black,
-      selectedItemColor: Colors.white,
-      unselectedItemColor: Colors.white,
+      backgroundColor: Color(0xFFF7EEE4),
+      selectedItemColor: Color(0xFF0F1C43),
+      unselectedItemColor: Color(0xFF0F1C43),
       showSelectedLabels: true,
       showUnselectedLabels: true,
       onTap: (index) => _onItemTapped(context, index),
       items: [
         BottomNavigationBarItem(
           icon: Icon(Icons.book),
-          label: '이야기책',
+          label: '자서전',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.group),

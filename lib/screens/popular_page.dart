@@ -6,16 +6,13 @@ class PopularPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
         elevation: 0,
         title: const Text('인기 게시판', style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
             fontSize: 20
         )),
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           },

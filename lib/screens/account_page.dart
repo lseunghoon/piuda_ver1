@@ -8,7 +8,6 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.notifications, color: Colors.black),
@@ -17,7 +16,6 @@ class AccountPage extends StatelessWidget {
           },
         ),
         title: const Text('계정', style: TextStyle(
-            fontWeight: FontWeight.bold,
             color: Colors.black,
             fontSize: 20
         )
@@ -68,7 +66,6 @@ class AccountPage extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue, // 버튼의 배경색을 blue로 설정
               ),
 
               child: Text(

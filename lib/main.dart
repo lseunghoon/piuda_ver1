@@ -5,8 +5,8 @@ import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/models/image_model.dart';
 import 'package:piuda_ui/models/auth_model.dart';
 import 'package:provider/provider.dart';
-import 'package:piuda_ui/screens/story_list_page.dart';
-import 'package:permission_handler/permission_handler.dart'; // permission_handler 패키지 임포트
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,8 +29,38 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        fontFamily: 'godic',
+        primaryColor: Color(0xFFF7EEE4), // 앱바 색상으로 적용
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: Color(0xFFF7EEE4), // 앱의 주요 색상
+          secondary: Color(0xFF0F1C43), // 보조 색상 (버튼 색상 등)
+          surface: Color(0xFFF4A261), // 표면 색상
+        ),
+        scaffoldBackgroundColor: Color(0xFFF7EEE4), // 앱 배경화면 색상
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFFF7EEE4), // 앱바의 배경색
+          foregroundColor: Color(0xFF0F1C43), // 앱바의 텍스트 및 아이콘 색상
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF0F1C43), // 버튼의 배경색
+            foregroundColor: Colors.white, // 버튼의 텍스트 색상
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10), // 둥근 모서리
+            ),
+          ),
+        ),
       ),
+      locale: Locale('ko', 'KR'), // 한국어로 설정
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'), // 영어
+        const Locale('ko', 'KR'), // 한국어
+      ],
       home: SplashScreen(),
     );
   }
@@ -101,7 +131,6 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.white,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

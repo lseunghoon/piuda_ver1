@@ -38,7 +38,6 @@ class _BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.notifications, color: Colors.black),
@@ -47,7 +46,6 @@ class _BoardPageState extends State<BoardPage> {
           },
         ),
         title: const Text('게시판', style: TextStyle(
-            fontWeight: FontWeight.bold,
             color: Colors.black,
             fontSize: 20
         )),
@@ -78,7 +76,7 @@ class _BoardPageState extends State<BoardPage> {
       height: 50,  // Desired height
       margin: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Color(0xFF0F1C43),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Stack(
@@ -98,11 +96,17 @@ class _BoardPageState extends State<BoardPage> {
                             child: ChoiceChip(
                               label: Text(board),
                               selected: selectedChip == board,
-                              backgroundColor: Colors.grey[300],
-                              selectedColor: Colors.blue,
+                              backgroundColor: Colors.white, // 기본 배경색
+                              selectedColor: Colors.grey[300], // 선택된 상태의 배경색 (파란색 대신)
                               labelStyle: TextStyle(
-                                color: selectedChip == board ? Colors.white : Colors.black,
+                                color: selectedChip == board ? Colors.black : Colors.black,
                               ),
+                              avatar: selectedChip == board
+                                  ? Icon(
+                                Icons.check,
+                                color: Colors.blue, // 선택된 상태에서의 체크 표시 색상
+                              )
+                                  : null, // 선택되지 않은 상태에서는 표시하지 않음
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 side: BorderSide(
@@ -131,7 +135,7 @@ class _BoardPageState extends State<BoardPage> {
               child: Builder(
                 builder: (BuildContext context) {
                   return IconButton(
-                    icon: const Icon(Icons.add, color: Colors.blue, size: 30),
+                    icon: const Icon(Icons.add, color: Colors.white, size: 30),
                     onPressed: () {
                       Scaffold.of(context).openEndDrawer(); // Use the context from the Builder
                     },
@@ -154,13 +158,12 @@ class _BoardPageState extends State<BoardPage> {
         children: <Widget>[
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color : Color(0xFFF7EEE4),
             ),
             child: Text(
               '게시판 수정',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
                 fontSize: 24,
               ),
             ),
@@ -200,7 +203,7 @@ class _BoardPageState extends State<BoardPage> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         decoration: BoxDecoration(
-          color: Colors.grey[200],
+          color: Color(0xFF0F1C43),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
@@ -213,7 +216,7 @@ class _BoardPageState extends State<BoardPage> {
                   Text(
                     boardType,
                     style: const TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.bold),
                   ),
@@ -296,7 +299,7 @@ class _BoardPageState extends State<BoardPage> {
                     '더 보기 >',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Colors.white,
                     ),
                   ),
                 ),

@@ -23,6 +23,22 @@ class _SignUpPageState extends State<SignUpPage> {
       initialDate: DateTime(2000),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Colors.black, // 헤더 색상
+              onSurface: Colors.black, // 텍스트 색상 (일반)
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.black, // 버튼 텍스트 색상
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -81,8 +97,9 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text('회원가입'),
+        title: Text('회원가입',style: TextStyle(color : Colors.black),),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -91,21 +108,30 @@ class _SignUpPageState extends State<SignUpPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Icon(Icons.circle, color: Colors.green),
-                  SizedBox(width: 8),
-                  Icon(Icons.circle_outlined),
-                  SizedBox(width: 8),
-                  Icon(Icons.circle_outlined),
-                ],
-              ),
               SizedBox(height: 16),
               TextFormField(
                 controller: _validationModel.nameController,
                 decoration: InputDecoration(
                   labelText: '성명',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
                 ),
                 validator: _validationModel.validateName,  // 유효성 검사 추가
               ),
@@ -114,7 +140,25 @@ class _SignUpPageState extends State<SignUpPage> {
                 decoration: InputDecoration(
                   labelText: '생년월일',
                   hintText: 'YYYY-MM-DD',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
                 ),
                 readOnly: true,
                 onTap: () => _selectDate(context),
@@ -129,7 +173,25 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _validationModel.phoneNumberController,
                 decoration: InputDecoration(
                   labelText: '전화번호',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
                 ),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
@@ -142,7 +204,25 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _validationModel.emailController,
                 decoration: InputDecoration(
                   labelText: '이메일',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
                 ),
                 validator: _validationModel.validateEmail,  // 유효성 검사 추가
               ),
@@ -151,7 +231,25 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _validationModel.passwordController,
                 decoration: InputDecoration(
                   labelText: '비밀번호',
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
                 ),
                 obscureText: true,
                 validator: _validationModel.validatePassword,  // 유효성 검사 추가
@@ -162,7 +260,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Text('회원가입'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50),
-                  backgroundColor: Colors.green,
                 ),
               ),
             ],

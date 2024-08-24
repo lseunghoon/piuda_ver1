@@ -68,8 +68,26 @@ class _LoginPageState extends State<LoginPage> {
                       focusNode: _validationModel.phoneNumberFocusNode,
                       decoration: InputDecoration(
                         labelText: '전화번호',
-                        labelStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
+                          borderSide: BorderSide(
+                            color: Colors.black, // 기본 테두리 색상: 검은색
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                            width: 2.0, // 포커스된 상태의 테두리 두께
+                          ),
+                        ),
                       ),
                       inputFormatters: [
                         FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
@@ -84,8 +102,26 @@ class _LoginPageState extends State<LoginPage> {
                       obscureText: true,
                       decoration: InputDecoration(
                         labelText: '비밀번호',
-                        labelStyle: TextStyle(color: Colors.grey),
-                        border: OutlineInputBorder(),
+                        labelStyle: TextStyle(color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
+                          borderSide: BorderSide(
+                            color: Colors.black, // 기본 테두리 색상: 검은색
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                            width: 2.0, // 포커스된 상태의 테두리 두께
+                          ),
+                        ),
                       ),
                       validator: _validationModel.validatePassword,
                     ),
@@ -101,7 +137,6 @@ class _LoginPageState extends State<LoginPage> {
                       },
                       child: Text('로그인'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
                         minimumSize: Size(double.infinity, 50),
                       ),
                     ),
@@ -113,14 +148,14 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));
                           },
-                          child: Text('회원가입'),
+                          child: Text('회원가입',style: TextStyle(color: Colors.black),),
                         ),
-                        Text('|', style: TextStyle(color: Colors.grey)),
+                        Text('|'),
                         TextButton(
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPage()));
                           },
-                          child: Text('비밀번호 재설정'),
+                          child: Text('비밀번호 재설정',style: TextStyle(color: Colors.black),),
                         ),
                       ],
                     ),

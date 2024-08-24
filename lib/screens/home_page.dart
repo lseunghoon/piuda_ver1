@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                     '흐린 날이에요.\n오후도 화이팅하세요.',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                     ),
                   ),
                 ),
@@ -111,20 +111,7 @@ class _HomePageState extends State<HomePage> {
                       final imageUrl = imageProvider.imageUrls[index - 1];
                       final imageId = imageUrl;  // 여기서 imageId를 imageUrl로 설정
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ChatPage(
-                                imageUrl: imageUrl,
-                                imageId: imageId, // 전달할 imageId 추가
-                              ),
-                            ),
-                          );
-                        },
-                        child: _buildRemoteImageCard(context, index - 1, imageProvider),  // Remote images only
-                      );
+                      return _buildRemoteImageCard(context, index - 1, imageProvider, imageId, imageUrl);
                     }
                   },
                 ),
@@ -143,17 +130,17 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10.0),
         decoration: BoxDecoration(
-          color: Colors.grey[300],
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_circle, color: Colors.blue, size: 80),
+              Icon(Icons.add_circle, size: 80, color: Color(0xFF0F1C43)),
               SizedBox(height: 8),
               Text(
-                '과거의 나를 불러오세요.',
+                '과거의 나를 만나보세요',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.black,
@@ -166,9 +153,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRemoteImageCard(BuildContext context, int index, ImageProviderModel imageProvider) {
-    final imageUrl = imageProvider.imageUrls[index];
-
+  Widget _buildRemoteImageCard(BuildContext context, int index, ImageProviderModel imageProvider, String imageId, String imageUrl) {
     return Stack(
       children: [
         Container(
@@ -192,13 +177,34 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: Colors.grey,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.close,
                 color: Colors.white,
               ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 10,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                      imageUrl: imageUrl,
+                      imageId: imageId, // 전달할 imageId 추가
+                    ),
+                  ),
+                );
+              },
+              child: Text('대화하기'),
             ),
           ),
         ),

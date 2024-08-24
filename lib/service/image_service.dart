@@ -4,9 +4,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'dart:io';
+import 'package:piuda_ui/constants/constants.dart';
 
 class ImageService {
-  final String _baseUrl = 'https://0bc2-163-152-3-136.ngrok-free.app'; //https://23ad-1-239-39-76.ngrok-free.app
+  final String _baseUrl = baseUrl; //https://23ad-1-239-39-76.ngrok-free.app
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   // 이미지 업로드 (Base64 인코딩 및 화질 저하)

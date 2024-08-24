@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:piuda_ui/constants/constants.dart';
 
 class CustomAuthProvider with ChangeNotifier {
   bool _isLoggedIn = false;
@@ -41,12 +42,12 @@ class CustomAuthProvider with ChangeNotifier {
 }
 
 class AuthService {
-  final String baseUrl = 'https://0bc2-163-152-3-136.ngrok-free.app'; // https://23ad-1-239-39-76.ngrok-free.app";
+  final String _baseUrl = baseUrl; // https://23ad-1-239-39-76.ngrok-free.app";
   final storage = FlutterSecureStorage();
 
   // 이메일/비밀번호로 회원가입
   Future<bool> registerWithEmailAndPassword(String name, String phoneNumber, String password, String birthDate, String gender) async {
-    final url = Uri.parse('$baseUrl/signup');
+    final url = Uri.parse('$_baseUrl/signup');
     final body = jsonEncode({
       'name': name,
       'phone_number': phoneNumber,
