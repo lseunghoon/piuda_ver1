@@ -3,6 +3,7 @@ import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/screens/story_list_page.dart';
 import 'package:piuda_ui/screens/account_page.dart';
 import 'package:piuda_ui/screens/board_page.dart';
+import 'package:piuda_ui/screens/setting_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -40,7 +41,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
         }
         break;
       case 4:
-      // 설정 페이지로 이동 (추후 추가)
+        if (currentIndex != 4) {
+          Navigator.of(context).pushReplacement(
+            _createRoute(SettingsPage2()), // AccountPage로 이동
+          );
+        }
         break;
     }
   }

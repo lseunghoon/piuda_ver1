@@ -6,7 +6,7 @@ import 'package:image/image.dart' as img;
 import 'dart:io';
 
 class ImageService {
-  final String _baseUrl = 'http://172.23.247.114:8000';
+  final String _baseUrl = 'https://0bc2-163-152-3-136.ngrok-free.app'; //https://23ad-1-239-39-76.ngrok-free.app
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   // 이미지 업로드 (Base64 인코딩 및 화질 저하)
@@ -40,6 +40,36 @@ class ImageService {
 
     // 6. 서버로 이미지 업로드 및 반환 값 받기
     return await uploadImage(base64Image, pickedFile.name, targetAge);
+  }
+
+  Future<String?> uploadImageFromGallery() async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) {
+      print("No image selected.");
+      return null;
+    }
+
+    // 이미지 파일 읽기
+    final File imageFile = File(pickedFile.path);
+    final imageBytes = await imageFile.readAsBytes();
+
+    // 이미지 디코딩
+    img.Image? originalImage = img.decodeImage(imageBytes);
+    if (originalImage == null) {
+      print("Failed to decode image.");
+      return null;
+    }
+
+    // 화질 저하 (리사이즈 없이 화질만 저하)
+    List<int> compressedImageBytes = img.encodeJpg(originalImage, quality: 100);
+
+    // Base64로 인코딩
+    String base64Image = base64Encode(compressedImageBytes);
+
+    // 서버로 이미지 업로드 및 URL 반환
+    return await uploadImage(base64Image, pickedFile.name, '0'); // targetAge를 '0'으로 설정
   }
 
   // 서버로 이미지 업로드

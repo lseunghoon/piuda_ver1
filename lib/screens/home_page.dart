@@ -108,12 +108,18 @@ class _HomePageState extends State<HomePage> {
                     } else if (index == 0) {
                       return _buildAddImageButton(context);  // First index for add button
                     } else {
+                      final imageUrl = imageProvider.imageUrls[index - 1];
+                      final imageId = imageUrl;  // 여기서 imageId를 imageUrl로 설정
+
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ChatPage(imageUrl: imageProvider.imageUrls[index - 1]), // 전달할 이미지 URL
+                              builder: (context) => ChatPage(
+                                imageUrl: imageUrl,
+                                imageId: imageId, // 전달할 imageId 추가
+                              ),
                             ),
                           );
                         },
@@ -215,12 +221,16 @@ class _HomePageState extends State<HomePage> {
                   Navigator.of(context).pop(); // 모달 닫기
 
                   // 갤러리에서 이미지 선택 및 서버로 업로드
-                  String? imageUrl = await _selectAndUploadImage(context, ImageSource.gallery);
+                  final imageService = ImageService();
+                  String? imageUrl = await imageService.uploadImageFromGallery();
 
                   if (imageUrl != null) {
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
                     // 이미지를 추가한 후 홈 화면으로 이동
-                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
                   }
                 },
               ),

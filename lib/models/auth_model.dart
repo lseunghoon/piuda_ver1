@@ -41,7 +41,7 @@ class CustomAuthProvider with ChangeNotifier {
 }
 
 class AuthService {
-  final String baseUrl = 'http://172.23.244.44:8000'; // FastAPI 공용ip URL "http://49.142.181.186:8000";
+  final String baseUrl = 'https://0bc2-163-152-3-136.ngrok-free.app'; // https://23ad-1-239-39-76.ngrok-free.app";
   final storage = FlutterSecureStorage();
 
   // 이메일/비밀번호로 회원가입
