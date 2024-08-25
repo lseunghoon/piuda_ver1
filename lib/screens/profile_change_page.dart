@@ -47,7 +47,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text('프로필 수정',
             style: TextStyle(
@@ -109,7 +108,6 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
                 child: ElevatedButton(
                   onPressed: _saveProfile,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
                   ),
                   child: Text(
                     '저장',

@@ -4,7 +4,6 @@ import 'package:piuda_ui/widgets/bottom_navigator.dart';
 import 'package:piuda_ui/screens/alarm_page.dart';
 import 'package:piuda_ui/screens/chat_page.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:piuda_ui/service/image_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   final ImageService _apiService = ImageService(); // ImageService 인스턴스 생성
+  final PageController _pageController = PageController(viewportFraction: 0.7);
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('홈'),
+        title: Text('라떼'),
         centerTitle: true,
         leading: IconButton(
           icon: Icon(Icons.notifications),
@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 height: 300,
                 child: PageView.builder(
-                  controller: PageController(viewportFraction: 0.7),
-                  itemCount: imageProvider.imageUrls.length + 1,  // Add one for the add button
+                  controller: _pageController,
+                  itemCount: imageProvider.imageUrls.length + 1, // Add one for the add button
                   onPageChanged: (index) {
                     setState(() {
                       _currentPage = index;
@@ -104,14 +104,15 @@ class _HomePageState extends State<HomePage> {
                   },
                   itemBuilder: (context, index) {
                     if (index == 0 && imageProvider.imageUrls.isEmpty) {
-                      return _buildAddImageButton(context);  // Show add button when list is empty
+                      return _buildAddImageButton(context); // Show add button when list is empty
                     } else if (index == 0) {
-                      return _buildAddImageButton(context);  // First index for add button
+                      return _buildAddImageButton(context); // First index for add button
                     } else {
                       final imageUrl = imageProvider.imageUrls[index - 1];
-                      final imageId = imageUrl;  // 여기서 imageId를 imageUrl로 설정
+                      final imageId = imageUrl; // 여기서 imageId를 imageUrl로 설정
 
-                      return _buildRemoteImageCard(context, index - 1, imageProvider, imageId, imageUrl);
+                      return _buildRemoteImageCard(
+                          context, index - 1, imageProvider, imageId, imageUrl);
                     }
                   },
                 ),
@@ -153,62 +154,80 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildRemoteImageCard(BuildContext context, int index, ImageProviderModel imageProvider, String imageId, String imageUrl) {
-    return Stack(
-      children: [
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 10.0),
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(20),
-            image: DecorationImage(
-              image: NetworkImage(imageUrl),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        Positioned(
-          right: 10,
-          top: 10,
-          child: GestureDetector(
-            onTap: () {
-              imageProvider.deleteImage(imageUrl);
-            },
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                shape: BoxShape.circle,
+  Widget _buildRemoteImageCard(BuildContext context, int index,
+      ImageProviderModel imageProvider, String imageId, String imageUrl) {
+    return AnimatedBuilder(
+      animation: _pageController,
+      builder: (context, child) {
+        double value = 1.0;
+
+        // "과거의 나를 만나보세요" 카드 (인덱스 0)는 크기 변화에서 제외
+        if (index != 0 && _pageController.position.haveDimensions) {
+          double currentPage = _pageController.page ?? _pageController.initialPage.toDouble();
+          // "과거의 나를 만나보세요" 카드가 아닌 다른 카드들만 크기 변화를 적용
+          value = (currentPage.round() == index) ? 1 : 1;
+        }
+
+        return Transform.scale(
+          scale: value,
+          child: Stack(
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(20),
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-              child: Icon(
-                Icons.close,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 10,
-          left: 0,
-          right: 0,
-          child: Center(
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                      imageUrl: imageUrl,
-                      imageId: imageId, // 전달할 imageId 추가
+              Positioned(
+                right: 10,
+                top: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    imageProvider.deleteImage(imageUrl);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
                     ),
                   ),
-                );
-              },
-              child: Text('대화하기'),
-            ),
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            imageUrl: imageUrl,
+                            imageId: imageId, // 전달할 imageId 추가
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text('대화하기'),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -228,7 +247,8 @@ class _HomePageState extends State<HomePage> {
 
                   // 갤러리에서 이미지 선택 및 서버로 업로드
                   final imageService = ImageService();
-                  String? imageUrl = await imageService.uploadImageFromGallery();
+                  String? imageUrl =
+                  await imageService.uploadImageFromGallery();
 
                   if (imageUrl != null) {
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
@@ -246,19 +266,19 @@ class _HomePageState extends State<HomePage> {
                 onTap: () async {
                   Navigator.of(context).pop(); // 모달 닫기
 
-                  // ImageService 인스턴스 생성
-                  final imageService = ImageService();
+                  // 이미지 촬영, 업로드, 페르소나 생성 모두 처리
+                  Map<String, dynamic>? personaData = await _apiService.captureAndUploadImageAndCreatePersona('0');
 
-                  // 카메라로 이미지 촬영 및 서버로 업로드
-                  String? imageUrl = await imageService.captureAndUploadImage('0'); // '0'은 targetAge 예시입니다.
-
-                  if (imageUrl != null) {
+                  if (personaData != null && personaData['image_url'] != null) {
+                    String imageUrl = personaData['image_url'];
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
-                    // 이미지를 추가한 후 HomePage로 이동
+                    // 이미지를 추가한 후 홈 화면으로 이동
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomePage()),
                     );
+                  } else {
+                    print("Failed to upload image or create persona.");
                   }
                 },
               ),
@@ -267,25 +287,5 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
-  }
-
-  Future<String?> _selectAndUploadImage(BuildContext context, ImageSource source) async {
-    final picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: source);
-
-    if (pickedFile == null) {
-      print("No image selected.");
-      return null;
-    }
-
-    // 서버로 이미지 업로드 및 반환 값 받기
-    String? imageUrl = await _apiService.captureAndUploadImage('0');
-
-    // 이미지 업로드 후 홈 화면으로 이동
-    if (imageUrl != null) {
-      Navigator.of(context).pop(); // 현재 화면(카메라 화면) 종료
-    }
-
-    return imageUrl;
   }
 }

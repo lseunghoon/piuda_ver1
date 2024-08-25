@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:piuda_ui/models/auth_model.dart';
+import 'package:piuda_ui/service/auth_service.dart';
 import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/screens/signup_page.dart'; // 회원가입 페이지 임포트
 import 'package:piuda_ui/screens/pw_reset_page.dart'; // 비밀번호 재설정 페이지 임포트
@@ -35,14 +35,16 @@ class _LoginPageState extends State<LoginPage> {
       String password = _validationModel.passwordController.text.trim();
 
       final authService = Provider.of<AuthService>(context, listen: false);
-      bool isLoggedIn = await authService.signInWithPhoneNumberAndPassword(phoneNumber, password);
+      String? userId = await authService.signInWithPhoneNumberAndPassword(phoneNumber, password);
 
-      if (isLoggedIn) {
+      if (userId != null) {
+        // 로그인 성공
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomePage()),
         );
       } else {
+        // 로그인 실패
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('로그인에 실패했습니다. 전화번호와 비밀번호를 확인해주세요.')),
         );
@@ -128,13 +130,13 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: 16),
                     ElevatedButton(
                       onPressed:
-                      //_validateAndLogin,
-                          () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomePage()),
-                        );
-                      },
+                      _validateAndLogin,
+                      //     () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(builder: (context) => HomePage()),
+                      //   );
+                      // },
                       child: Text('로그인'),
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(double.infinity, 50),

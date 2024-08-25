@@ -73,6 +73,11 @@ class _ChatBotPageState extends State<ChatPage> {
       _addMessage(transcription, true); // STT 결과를 사용자 메시지로 추가
       _addMessage(gptResponse, false); // GPT 답변을 추가
 
+      // GPT 답변 음성 재생
+      if (response['response_voice'] != null && response['response_voice']!.isNotEmpty) {
+        await _apiService.playResponseVoice(response['response_voice']!);
+      }
+
       _scrollToBottom(); // 새 메시지가 추가된 후 스크롤을 아래로 이동
     } else {
       print('녹음 파일이 없습니다.');
@@ -96,6 +101,7 @@ class _ChatBotPageState extends State<ChatPage> {
       return {
         'transcription': '오류가 발생했습니다.',
         'gpt_response': '오류가 발생했습니다.',
+        'response_voice': ''
       };
     }
   }
@@ -131,11 +137,13 @@ class _ChatBotPageState extends State<ChatPage> {
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -187,7 +195,7 @@ class _ChatBotPageState extends State<ChatPage> {
                     padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
                     decoration: BoxDecoration(
                       color: message['isUserMessage']
-                          ? Colors.blue
+                          ? Color(0xFF0F1C43)
                           : Colors.grey[300],
                       borderRadius: BorderRadius.circular(10.0),
                     ),
@@ -214,7 +222,7 @@ class _ChatBotPageState extends State<ChatPage> {
                   child: Container(
                     padding: EdgeInsets.all(20.0),
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: Color(0xFF0F1C43),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

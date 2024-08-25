@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:piuda_ui/screens/signin_page.dart';
 import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/models/image_model.dart';
-import 'package:piuda_ui/models/auth_model.dart';
+import 'package:piuda_ui/service/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         fontFamily: 'godic',

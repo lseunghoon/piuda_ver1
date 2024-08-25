@@ -66,7 +66,6 @@ class _ResetPageState extends State<ResetPage> {
                   '전화번호',
                   textAlign: TextAlign.start,
                   style: TextStyle(
-                    fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
                 ),
@@ -82,7 +81,6 @@ class _ResetPageState extends State<ResetPage> {
                     hintText: '01012345678',
                   ),
                   style: TextStyle(
-                    fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
                   validator: _model.validatePhoneNumber, // 전화번호 검증 로직 추가
@@ -93,7 +91,6 @@ class _ResetPageState extends State<ResetPage> {
                 child: Text(
                   '인증번호',
                   style: TextStyle(
-                    fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
                 ),
@@ -109,7 +106,6 @@ class _ResetPageState extends State<ResetPage> {
                     hintText: '_ _ _ _ _ _',
                   ),
                   style: TextStyle(
-                    fontFamily: 'Readex Pro',
                     letterSpacing: 0,
                   ),
                   validator: _model.validatePassword, // 인증번호 검증 로직 추가
@@ -119,10 +115,8 @@ class _ResetPageState extends State<ResetPage> {
                 padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 10),
                 child: ElevatedButton(
                   onPressed: _validateAndSubmit,  // 버튼 클릭 시 유효성 검사와 출력 실행
-                  child: Text('Next'),
+                  child: Text('다음'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     textStyle: TextStyle(fontSize: 18),
                     shape: RoundedRectangleBorder(

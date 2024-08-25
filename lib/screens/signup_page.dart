@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:piuda_ui/screens/home_page.dart';
-import 'package:piuda_ui/models/auth_model.dart';
+import 'package:piuda_ui/service/auth_service.dart';
 import 'package:piuda_ui/models/text_validation_model.dart';
 import 'package:flutter/services.dart';
 import 'package:piuda_ui/models/phonenum_format.dart';
@@ -13,7 +13,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _validationModel = TextValidationModel(); // TextValidationModel 인스턴스 생성
-
+  String _selectedGender = '남성'; // 성별 선택 초기값
   DateTime? _selectedDate;
   final AuthService _authService = AuthService();
 
@@ -51,13 +51,12 @@ class _SignUpPageState extends State<SignUpPage> {
     if (_formKey.currentState!.validate()) {
       String name = _validationModel.nameController.text.trim();
       String phoneNumber = _validationModel.phoneNumberController.text.trim().replaceAll('-', ''); // 하이픈 제거
-      String email = _validationModel.emailController.text.trim();
       String password = _validationModel.passwordController.text.trim();
       String birthDate = _selectedDate != null ? "${_selectedDate!.toLocal()}".split(' ')[0] : '';
 
       try {
         bool isRegistered = await _authService.registerWithEmailAndPassword(
-            name, phoneNumber, password, birthDate, 'gender'); // gender는 실제 데이터로 교체 필요
+            name, phoneNumber, password, birthDate, _selectedGender); // gender를 추가하여 실제 데이터로 전송
 
         if (isRegistered) {
           Navigator.pushReplacement(
@@ -99,9 +98,9 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Text('회원가입',style: TextStyle(color : Colors.black),),
+        title: Text('회원가입', style: TextStyle(color: Colors.black)),
       ),
-      body: Padding(
+      body: SingleChildScrollView( // SingleChildScrollView로 감싸기
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -109,6 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 16),
+              // 성명 입력 필드
               TextFormField(
                 controller: _validationModel.nameController,
                 decoration: InputDecoration(
@@ -133,9 +133,71 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                 ),
-                validator: _validationModel.validateName,  // 유효성 검사 추가
+                validator: _validationModel.validateName, // 유효성 검사 추가
               ),
               SizedBox(height: 16),
+              // 전화번호 입력 필드
+              TextFormField(
+                controller: _validationModel.phoneNumberController,
+                decoration: InputDecoration(
+                  labelText: '전화번호',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
+                  PhoneNumberInputFormatter(), // 전화번호 포맷 적용
+                ],
+                validator: _validationModel.validatePhoneNumber, // 유효성 검사 추가
+              ),
+              SizedBox(height: 16),
+              // 비밀번호 입력 필드
+              TextFormField(
+                controller: _validationModel.passwordController,
+                decoration: InputDecoration(
+                  labelText: '비밀번호',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 기본 테두리 색상: 검은색
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                      width: 2.0, // 포커스된 상태의 테두리 두께
+                    ),
+                  ),
+                ),
+                obscureText: true,
+                validator: _validationModel.validatePassword, // 유효성 검사 추가
+              ),
+              SizedBox(height: 16),
+              // 생년월일 입력 필드
               TextFormField(
                 decoration: InputDecoration(
                   labelText: '생년월일',
@@ -169,92 +231,40 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
               SizedBox(height: 16),
-              TextFormField(
-                controller: _validationModel.phoneNumberController,
-                decoration: InputDecoration(
-                  labelText: '전화번호',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 기본 테두리 색상: 검은색
+              // 성별 선택 필드
+              Text('성별', style: TextStyle(fontSize: 16)),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('남성'),
+                      value: '남성',
+                      groupValue: _selectedGender,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedGender = value!;
+                        });
+                      },
+                      activeColor: Colors.black,  // 선택된 상태에서의 체크 표시 색상
                     ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: const Text('여성'),
+                      value: '여성',
+                      groupValue: _selectedGender,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedGender = value!;
+                        });
+                      },
+                      activeColor: Colors.black,  // 선택된 상태에서의 체크 표시 색상
                     ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
-                      width: 2.0, // 포커스된 상태의 테두리 두께
-                    ),
-                  ),
-                ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
-                  PhoneNumberInputFormatter(), // 전화번호 포맷 적용
                 ],
-                validator: _validationModel.validatePhoneNumber,  // 유효성 검사 추가
               ),
               SizedBox(height: 16),
-              TextFormField(
-                controller: _validationModel.emailController,
-                decoration: InputDecoration(
-                  labelText: '이메일',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 기본 테두리 색상: 검은색
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
-                      width: 2.0, // 포커스된 상태의 테두리 두께
-                    ),
-                  ),
-                ),
-                validator: _validationModel.validateEmail,  // 유효성 검사 추가
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _validationModel.passwordController,
-                decoration: InputDecoration(
-                  labelText: '비밀번호',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 기본 테두리 색상: 검은색
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
-                      width: 2.0, // 포커스된 상태의 테두리 두께
-                    ),
-                  ),
-                ),
-                obscureText: true,
-                validator: _validationModel.validatePassword,  // 유효성 검사 추가
-              ),
-              Spacer(),
+              // 회원가입 버튼
               ElevatedButton(
                 onPressed: _register,
                 child: Text('회원가입'),

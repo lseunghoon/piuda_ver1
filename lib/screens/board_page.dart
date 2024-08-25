@@ -19,8 +19,9 @@ class BoardPage extends StatefulWidget {
 }
 
 class _BoardPageState extends State<BoardPage> {
-  String? selectedChip;
+  String? selectedChip = '인기 게시판';
   Set<String> selectedBoards = {'인기 게시판'};
+
 
   Future<List<BoardItem>> fetchBoardItems(String boardType) async {
     // boardType에 따라 데이터를 다르게 로드하도록 수정
@@ -76,7 +77,7 @@ class _BoardPageState extends State<BoardPage> {
       height: 50,  // Desired height
       margin: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Color(0xFF0F1C43),
+        color: Color(0xFFF7EEE4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Stack(
@@ -96,21 +97,21 @@ class _BoardPageState extends State<BoardPage> {
                             child: ChoiceChip(
                               label: Text(board),
                               selected: selectedChip == board,
-                              backgroundColor: Colors.white, // 기본 배경색
-                              selectedColor: Colors.grey[300], // 선택된 상태의 배경색 (파란색 대신)
+                              backgroundColor: Colors.grey[300], // 선택되지 않은 상태의 배경색 (회색)
+                              selectedColor: Color(0xFF0F1C43), // 선택된 상태의 배경색
                               labelStyle: TextStyle(
-                                color: selectedChip == board ? Colors.black : Colors.black,
+                                color: selectedChip == board ? Colors.white : Colors.black, // 선택 상태에 따른 텍스트 색상
                               ),
                               avatar: selectedChip == board
                                   ? Icon(
                                 Icons.check,
-                                color: Colors.blue, // 선택된 상태에서의 체크 표시 색상
+                                color: Colors.white, // 선택된 상태에서의 체크 표시 색상
                               )
                                   : null, // 선택되지 않은 상태에서는 표시하지 않음
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 side: BorderSide(
-                                  color: Colors.transparent, // Remove outline for unselected chips
+                                  color: Colors.transparent, // 선택되지 않은 상태에서 외곽선 제거
                                 ),
                               ),
                               onSelected: (bool selected) {
@@ -182,6 +183,7 @@ class _BoardPageState extends State<BoardPage> {
   Widget _buildDrawerItem(String title, IconData icon, Color color) {
     return CheckboxListTile(
       title: Text(title),
+      checkColor: Color(0xFF0F1C43),
       secondary: Icon(icon, color: color),
       value: selectedBoards.contains(title),
       onChanged: (bool? value) {
