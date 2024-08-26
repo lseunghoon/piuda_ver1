@@ -3,6 +3,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:piuda_ui/service/audio_service.dart';
+import 'package:piuda_ui/service/story_service.dart'; // StoryService 임포트
 
 class ChatPage extends StatefulWidget {
   final String imageUrl;
@@ -22,6 +23,7 @@ class _ChatBotPageState extends State<ChatPage> {
   bool _isPlaying = false;
   bool _isRecordingCompleted = false;
   final AudioService _apiService = AudioService();
+  final StoryService _storyService = StoryService(); // StoryService 인스턴스 생성
 
   Map<String, List<Map<String, dynamic>>> _conversationHistory = {}; // 이미지별 대화 내역 저장
 
@@ -147,6 +149,23 @@ class _ChatBotPageState extends State<ChatPage> {
     });
   }
 
+  Future<void> _createStory() async {
+    try {
+      final result = await _storyService.makeStory(_conversationHistory[widget.imageId]!);
+      print("Story creation result: $result");
+
+      // 여기에서 결과 처리 (예: 알림 표시 등)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('자서전이 생성되었습니다 !')),
+      );
+    } catch (e) {
+      print("Failed to create story: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("자서전 생성에 실패했습니다")),
+      );
+    }
+  }
+
   final ScrollController _scrollController = ScrollController(); // ScrollController 추가
 
   @override
@@ -234,7 +253,7 @@ class _ChatBotPageState extends State<ChatPage> {
                 ),
                 SizedBox(width: 40), // 두 버튼 사이의 간격 조절
                 GestureDetector(
-                  onTap: () {},
+                  onTap: _createStory, // 이야기 생성 메서드 호출
                   child: Container(
                     padding: EdgeInsets.all(20.0),
                     decoration: BoxDecoration(

@@ -136,11 +136,13 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/image/latte.png',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
+              Transform.translate(offset: Offset(-10,0),
+                child: Image.asset(
+                  'assets/image/latte_splash.png',
+                  width: 300,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
               ),
               SizedBox(height: 20),
               Text(

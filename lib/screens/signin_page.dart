@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -55,116 +56,127 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _validationModel.phoneNumberController,
-                      focusNode: _validationModel.phoneNumberFocusNode,
-                      decoration: InputDecoration(
-                        labelText: '전화번호',
-                        labelStyle: TextStyle(color: Colors.black),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
-                          borderSide: BorderSide(
-                            color: Colors.black, // 기본 테두리 색상: 검은색
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
-                            width: 2.0, // 포커스된 상태의 테두리 두께
-                          ),
-                        ),
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
-                        PhoneNumberInputFormatter(), // 전화번호 포맷 적용
-                      ],
-                      validator: _validationModel.validatePhoneNumber,
-                    ),
-                    SizedBox(height: 16),
-                    TextFormField(
-                      controller: _validationModel.passwordController,
-                      focusNode: _validationModel.passwordFocusNode,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: '비밀번호',
-                        labelStyle: TextStyle(color: Colors.black),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
-                          borderSide: BorderSide(
-                            color: Colors.black, // 기본 테두리 색상: 검은색
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
-                            width: 2.0, // 포커스된 상태의 테두리 두께
-                          ),
-                        ),
-                      ),
-                      validator: _validationModel.validatePassword,
-                    ),
-                    SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed:
-                      _validateAndLogin,
-                      //     () {
-                      //   Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(builder: (context) => HomePage()),
-                      //   );
-                      // },
-                      child: Text('로그인'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));
-                          },
-                          child: Text('회원가입',style: TextStyle(color: Colors.black),),
-                        ),
-                        Text('|'),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPage()));
-                          },
-                          child: Text('비밀번호 재설정',style: TextStyle(color: Colors.black),),
-                        ),
-                      ],
-                    ),
-                  ],
+      body: SingleChildScrollView(  // 키보드가 올라올 때 스크롤 가능하도록 설정
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1, // 상단에 여유 공간 추가
                 ),
-              ),
-            ],
+                Transform.translate(
+                  offset: Offset(-10,-20),
+                  child: Image.asset(
+                    'assets/image/latte_splash.png',
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _validationModel.phoneNumberController,
+                        focusNode: _validationModel.phoneNumberFocusNode,
+                        decoration: InputDecoration(
+                          labelText: '전화번호',
+                          labelStyle: TextStyle(color: Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
+                            borderSide: BorderSide(
+                              color: Colors.black, // 기본 테두리 색상: 검은색
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                              width: 2.0, // 포커스된 상태의 테두리 두께
+                            ),
+                          ),
+                        ),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly, // 숫자만 입력 가능하도록 필터링
+                          PhoneNumberInputFormatter(), // 전화번호 포맷 적용
+                        ],
+                        validator: _validationModel.validatePhoneNumber,
+                      ),
+                      SizedBox(height: 16),
+                      TextFormField(
+                        controller: _validationModel.passwordController,
+                        focusNode: _validationModel.passwordFocusNode,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: '비밀번호',
+                          labelStyle: TextStyle(color: Colors.black),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10), // 둥근 모서리 정도 설정
+                            borderSide: BorderSide(
+                              color: Colors.black, // 기본 테두리 색상: 검은색
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black, // 활성화된 상태의 테두리 색상: 검은색
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Colors.black, // 포커스된 상태의 테두리 색상: 검은색
+                              width: 2.0, // 포커스된 상태의 테두리 두께
+                            ),
+                          ),
+                        ),
+                        validator: _validationModel.validatePassword,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _validateAndLogin,
+                        child: Text('로그인'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: Size(double.infinity, 50),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));
+                            },
+                            child: Text('회원가입',style: TextStyle(color: Colors.black),),
+                          ),
+                          Text('|'),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPage()));
+                            },
+                            child: Text('비밀번호 재설정',style: TextStyle(color: Colors.black),),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1, // 하단에 여유 공간 추가
+                ),
+              ],
+            ),
           ),
         ),
       ),

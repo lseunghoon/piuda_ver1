@@ -43,16 +43,17 @@ class AccountPage extends StatelessWidget {
             ),
             SizedBox(height: 15),
             Text(
-              '김석희 님',
+              '강백호 님',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 10),
             Text(
-              '010-4006-4**4',
+              '010-1478-1478',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: 15),
+            SizedBox(height: 10),
             Text(
-              '작년에 은퇴한 6학년 3반입니다. ^^ \n잘 부탁드리겠습니다!',
+              '안녕하세요 반갑습니다.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: Colors.black),
             ),
