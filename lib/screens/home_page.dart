@@ -133,6 +133,10 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Color(0xFF0F1C43),
+            width: 1,
+          ),
         ),
         child: Center(
           child: Column(
@@ -177,6 +181,10 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Color(0xFF0F1C43),
+                    width: 1,
+                  ),
                   image: DecorationImage(
                     image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
@@ -193,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Colors.grey,
+                      color: Color(0xFF0F1C43),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -245,18 +253,44 @@ class _HomePageState extends State<HomePage> {
                 onTap: () async {
                   Navigator.of(context).pop(); // 모달 닫기
 
+                  // 스낵바를 띄운다
+                  final snackBar = SnackBar(
+                    content: Text('과거의 나를 불러오는 중 . . .'),
+                    duration: Duration(days: 1), // 스낵바가 자동으로 사라지지 않도록 긴 시간 설정
+                  );
+                  final snackBarController = ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
                   // 갤러리에서 이미지 선택 및 서버로 업로드
                   final imageService = ImageService();
-                  String? imageUrl =
-                  await imageService.uploadImageFromGallery();
+                  String? imageUrl = await imageService.uploadImageFromGallery();
 
                   if (imageUrl != null) {
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
-                    // 이미지를 추가한 후 홈 화면으로 이동
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
+
+                    // 추가된 이미지의 인덱스 계산
+                    final newIndex = context.read<ImageProviderModel>().imageUrls.length - 1;
+
+                    // 상태를 갱신하여 UI를 업데이트
+                    setState(() {});
+
+                    // 이미지를 추가한 후 해당 이미지로 포커스 이동
+                    await _pageController.animateToPage(
+                      newIndex,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
                     );
+
+                    // 이미지 추가가 완료되면 이전 스낵바를 내리고 새로운 스낵바 표시
+                    snackBarController.close(); // 기존 스낵바 닫기
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('과거의 나를 생성했습니다!'),
+                        duration: Duration(seconds: 2), // 2초 동안 표시
+                      ),
+                    );
+                  } else {
+                    // 오류 발생 시 스낵바를 내린다
+                    snackBarController.close(); // 스낵바 닫기
                   }
                 },
               ),
@@ -266,19 +300,46 @@ class _HomePageState extends State<HomePage> {
                 onTap: () async {
                   Navigator.of(context).pop(); // 모달 닫기
 
+                  // 스낵바를 띄운다
+                  final snackBar = SnackBar(
+                    content: Text('과거의 나를 불러오는 중 . . .'),
+                    duration: Duration(days: 1), // 스낵바가 자동으로 사라지지 않도록 긴 시간 설정
+                  );
+                  final snackBarController = ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
                   // 이미지 촬영, 업로드, 페르소나 생성 모두 처리
-                  Map<String, dynamic>? personaData = await _apiService.captureAndUploadImageAndCreatePersona('0');
+                  Map<String, dynamic>? personaData =
+                  await _apiService.captureAndUploadImageAndCreatePersona('0');
 
                   if (personaData != null && personaData['image_url'] != null) {
                     String imageUrl = personaData['image_url'];
                     context.read<ImageProviderModel>().addImageUrl(imageUrl); // 새 이미지 URL 추가
-                    // 이미지를 추가한 후 홈 화면으로 이동
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomePage()),
+
+                    // 추가된 이미지의 인덱스 계산
+                    final newIndex = context.read<ImageProviderModel>().imageUrls.length - 1;
+
+                    // 상태를 갱신하여 UI를 업데이트
+                    setState(() {});
+
+                    // 이미지를 추가한 후 해당 이미지로 포커스 이동
+                    await _pageController.animateToPage(
+                      newIndex + 1,
+                      duration: Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+
+                    // 이미지 추가가 완료되면 이전 스낵바를 내리고 새로운 스낵바 표시
+                    snackBarController.close(); // 기존 스낵바 닫기
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('과거의 나를 생성했습니다!'),
+                        duration: Duration(seconds: 2), // 2초 동안 표시
+                      ),
                     );
                   } else {
                     print("Failed to upload image or create persona.");
+                    // 오류 발생 시 스낵바를 내린다
+                    snackBarController.close(); // 스낵바 닫기
                   }
                 },
               ),

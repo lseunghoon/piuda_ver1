@@ -109,7 +109,7 @@ class ImageService {
       };
 
       final response = await http.post(
-        Uri.parse('$_baseUrl/face/transform?target_age=$targetAge'),
+        Uri.parse('$_baseUrl/face/aging?target_age=$targetAge'),
         headers: {
           "Content-Type": "application/json",
         },

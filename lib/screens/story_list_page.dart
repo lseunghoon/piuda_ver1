@@ -15,6 +15,7 @@ class _StoryListPageState extends State<StoryListPage> {
   final StoryService _storyService = StoryService();
   final FlutterSecureStorage _storage = FlutterSecureStorage(); // FlutterSecureStorage 인스턴스 생성
   List<Map<String, String>> _storyList = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -30,15 +31,31 @@ class _StoryListPageState extends State<StoryListPage> {
       if (userId != null) {
         // userId를 getUserStory에 인자로 전달
         List<Map<String, String>> stories = await _storyService.getUserStory(userId);
+
+        // 모든 이미지가 로드된 후에만 로딩 상태를 false로 설정
+        for (var story in stories) {
+          await _loadImage(story['recallbook_paint'] ?? '');
+        }
+
         setState(() {
           _storyList = stories;
+          _isLoading = false; // 이미지 로딩이 완료된 후 로딩 상태를 false로 설정
         });
       } else {
         print("No user ID found in storage.");
       }
     } catch (e) {
       print("Failed to load stories: $e");
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  void _deleteStory(int index) {
+    setState(() {
+      _storyList.removeAt(index);
+    });
   }
 
   @override
@@ -62,7 +79,9 @@ class _StoryListPageState extends State<StoryListPage> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(color: Color(0xFF0F1C43))) // 로딩 중일 때 전체 인디케이터 표시
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,9 +94,9 @@ class _StoryListPageState extends State<StoryListPage> {
                   mainAxisSpacing: 16.0,
                   childAspectRatio: 1,
                 ),
-                itemCount: _storyList.length, // 더미 데이터를 제거하고 _storyList 사용
+                itemCount: _storyList.length, // _storyList 사용
                 itemBuilder: (context, index) {
-                  return _buildStoryCard(context, _storyList[index]);
+                  return _buildStoryCard(context, _storyList[index], index);
                 },
               ),
             ),
@@ -88,7 +107,7 @@ class _StoryListPageState extends State<StoryListPage> {
     );
   }
 
-  Widget _buildStoryCard(BuildContext context, Map<String, String> data) {
+  Widget _buildStoryCard(BuildContext context, Map<String, String> data, int index) {
     final title = data['recallbook_title'] ?? '제목 없음';
     final imageUrl = data['recallbook_paint'] ?? '';
     final description = data['recallbook_context'] ?? 'No description available';
@@ -106,70 +125,81 @@ class _StoryListPageState extends State<StoryListPage> {
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white, // 컨테이너의 배경색을 흰색으로 설정
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.grey),
-        ),
-        child: Stack(
-          children: [
-            FutureBuilder<ImageProvider>(
-              future: _loadImage(imageUrl),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: Text(
-                      '로딩 중', // 로딩 중일 때 표시할 텍스트
-                      style: TextStyle(fontSize: 16, color: Colors.black),
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Icon(Icons.error, color: Colors.red),
-                  );
-                } else if (snapshot.hasData) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                      image: DecorationImage(
-                        image: snapshot.data!,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                } else {
-                  return Container(); // snapshot.connectionState == ConnectionState.done인데 데이터가 없을 경우
-                }
-              },
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                color: Colors.black,
+                width: 1.0,
+              ),
+              image: DecorationImage(
+                image: _loadImageProvider(imageUrl),
+                fit: BoxFit.cover,
+              ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              decoration: BoxDecoration(
                 color: Colors.black.withOpacity(0.5),
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(8.0),
+                  bottomRight: Radius.circular(8.0),
+                ),
+              ),
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 5,
+            top: 5,
+            child: GestureDetector(
+              onTap: () {
+                _deleteStory(index); // 삭제 기능 호출
+              },
+              child: Container(
+                padding: EdgeInsets.all(1.5),
+                decoration: BoxDecoration(
+                  color: Color(0xFF0F1C43),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Future<ImageProvider> _loadImage(String imageUrl) async {
+  ImageProvider _loadImageProvider(String imageUrl) {
     if (imageUrl.startsWith('http')) {
       return NetworkImage(imageUrl);
     } else {
       return FileImage(File(imageUrl));
+    }
+  }
+
+  Future<void> _loadImage(String imageUrl) async {
+    if (imageUrl.startsWith('http')) {
+      await precacheImage(NetworkImage(imageUrl), context);
+    } else {
+      await File(imageUrl).exists(); // 로컬 파일이 존재하는지 확인
     }
   }
 }
