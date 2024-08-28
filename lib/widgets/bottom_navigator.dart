@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:piuda_ui/screens/home_page.dart';
 import 'package:piuda_ui/screens/story_list_page.dart';
 import 'package:piuda_ui/screens/account_page.dart';
-import 'package:piuda_ui/screens/board_page.dart';
 import 'package:piuda_ui/screens/setting_page.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
@@ -22,28 +21,21 @@ class CustomBottomNavigationBar extends StatelessWidget {
       case 1:
         if (currentIndex != 1) {
           Navigator.of(context).pushReplacement(
-            _createRoute(BoardPage()),
+            _createRoute(HomePage()),
           );
         }
         break;
       case 2:
         if (currentIndex != 2) {
           Navigator.of(context).pushReplacement(
-            _createRoute(HomePage()),
+            _createRoute(AccountPage()), // AccountPage로 이동
           );
         }
         break;
       case 3:
         if (currentIndex != 3) {
           Navigator.of(context).pushReplacement(
-            _createRoute(AccountPage()), // AccountPage로 이동
-          );
-        }
-        break;
-      case 4:
-        if (currentIndex != 4) {
-          Navigator.of(context).pushReplacement(
-            _createRoute(SettingsPage2()), // AccountPage로 이동
+            _createRoute(SettingsPage2()), // SettingsPage로 이동
           );
         }
         break;
@@ -85,10 +77,6 @@ class CustomBottomNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.book),
           label: '자서전',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.group),
-          label: '게시판',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.home),

@@ -177,7 +177,7 @@ class AccountPage extends StatelessWidget {
         ),
       ),
 
-      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 3),
+      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 2),
     );
   }
 }

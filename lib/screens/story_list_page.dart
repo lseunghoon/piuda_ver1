@@ -32,8 +32,9 @@ class _StoryListPageState extends State<StoryListPage> {
         // userId를 getUserStory에 인자로 전달
         List<Map<String, String>> stories = await _storyService.getUserStory(userId);
 
-        // 모든 이미지가 로드된 후에만 로딩 상태를 false로 설정
+        // 각 story의 recallbook_id를 출력하여 확인합니다.
         for (var story in stories) {
+          print("Loaded story recallbook_id: ${story['recallbook_id']}");
           await _loadImage(story['recallbook_paint'] ?? '');
         }
 
@@ -52,10 +53,35 @@ class _StoryListPageState extends State<StoryListPage> {
     }
   }
 
-  void _deleteStory(int index) {
-    setState(() {
-      _storyList.removeAt(index);
-    });
+  Future<void> _deleteStory(int index) async {
+    // FlutterSecureStorage에서 recallbook_id를 가져옵니다.
+    String? recallbookId = await _storyService.getSavedRecallbookId();
+
+    if (recallbookId != null && recallbookId.isNotEmpty) {
+      bool success = await _storyService.deleteStory(recallbookId);
+
+      if (success) {
+        setState(() {
+          _storyList.removeAt(index);
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('자서전이 삭제됐습니다.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('스토리 삭제에 실패했습니다.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      print("Recallbook ID is empty, cannot delete.");
+    }
   }
 
   @override
@@ -196,8 +222,9 @@ class _StoryListPageState extends State<StoryListPage> {
   }
 
   Future<void> _loadImage(String imageUrl) async {
+    // 캐시를 사용하지 않도록 _loadImage에서 아무런 처리를 하지 않음
     if (imageUrl.startsWith('http')) {
-      await precacheImage(NetworkImage(imageUrl), context);
+      // 캐시를 사용하지 않기 위해 따로 이미지 로드를 하지 않음
     } else {
       await File(imageUrl).exists(); // 로컬 파일이 존재하는지 확인
     }

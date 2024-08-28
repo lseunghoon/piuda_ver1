@@ -185,4 +185,49 @@ class PersonaService {
       return null;
     }
   }
+
+  // 페르소나 삭제
+  Future<bool> deletePersona(String personaId) async {
+    String? userId = await _storage.read(key: 'user_id'); // 로그인 시 저장된 user_id 가져오기
+
+    if (userId == null) {
+      print("No user_id found. Please log in first.");
+      return false;
+    }
+
+    try {
+      // 서버에 전송할 데이터 구성
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/persona/delete/$personaId?user_id=$userId'), // user_id를 쿼리 파라미터로 전달
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Persona deleted successfully: $personaId");
+
+        // 삭제 성공 시, 로컬 스토리지에서 persona_id 제거
+        await _storage.delete(key: 'persona_id');
+
+        return true;
+      } else {
+        print("Failed to delete persona. Status code: ${response.statusCode}");
+        print("Response body: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print("Error: $e");
+      return false;
+    }
+  }
+
+  Future<String?> getSavedPersonaId() async {
+    try {
+      return await _storage.read(key: 'persona_id');
+    } catch (e) {
+      print("Error retrieving personaId: $e");
+      return null;
+    }
+  }
 }

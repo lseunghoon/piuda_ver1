@@ -5,6 +5,7 @@ import 'package:piuda_ui/screens/alarm_page.dart';
 import 'package:piuda_ui/screens/chat_page.dart';
 import 'package:provider/provider.dart';
 import 'package:piuda_ui/service/image_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   final ImageService _apiService = ImageService(); // ImageService 인스턴스 생성
   final PageController _pageController = PageController(viewportFraction: 0.7);
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   @override
   void initState() {
@@ -121,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 2),
+      bottomNavigationBar: CustomBottomNavigationBar(currentIndex: 1),
     );
   }
 
@@ -191,12 +193,49 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              // 기존 코드에서 수정되는 부분
               Positioned(
                 right: 10,
                 top: 10,
                 child: GestureDetector(
-                  onTap: () {
-                    imageProvider.deleteImage(imageUrl);
+                  onTap: () async {
+                    // 페르소나 서비스 인스턴스 생성
+                    final personaService = PersonaService();
+
+                    // `ImageService`에서 `personaId`를 가져옴
+                    final personaId = await personaService.getSavedPersonaId();
+                    print(personaId);
+
+                    if (personaId == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('페르소나 ID를 찾을 수 없습니다.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // 페르소나 삭제 요청
+                    final success = await personaService.deletePersona(personaId);
+
+                    if (success) {
+                      // 페르소나 삭제가 성공하면 이미지도 삭제
+                      imageProvider.deleteImage(imageUrl);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('페르소나가 삭제되었습니다.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('페르소나 삭제에 실패했습니다.'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   },
                   child: Container(
                     margin: EdgeInsets.symmetric(horizontal: 10),
@@ -208,6 +247,42 @@ class _HomePageState extends State<HomePage> {
                       Icons.close,
                       color: Colors.white,
                     ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      // `ImageService`에서 `personaId`를 가져옴
+                      final personaService = PersonaService();
+                      final personaId = await personaService.getSavedPersonaId();
+
+                      if (personaId == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('페르소나 ID를 찾을 수 없습니다.'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
+
+                      // 대화 페이지로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            imageUrl: imageUrl,
+                            imageId: personaId, // 전달할 personaId 사용
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text('대화하기'),
                   ),
                 ),
               ),
